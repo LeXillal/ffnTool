@@ -2,7 +2,6 @@
 let timeoutSearchBar = null;
 let epreuvesList = null;
 let selectedSwimmer = null;
-const host = "http://167.86.88.132:4444"
 // Elements
 const searchBar = document.getElementById('searchBar');
 const resultDiv = document.getElementById('searchResult');
@@ -14,7 +13,7 @@ const performancesDiv = document.getElementById('performancesContent')
 
 window.onload = async () => {
 	// Get epreuves
-	const response = await fetch(host+'/epreuves/').then(response => response.json());
+	const response = await fetch('/epreuves/').then(response => response.json());
 	epreuvesList = response;
 }
 searchBar.addEventListener('keyup', function (event) {
@@ -23,8 +22,7 @@ searchBar.addEventListener('keyup', function (event) {
 });
 
 async function searchSwimmer(value) {
-	let recherche = host+'/searchswimmer/' + value
-	let response = await fetch(recherche).then(response => response.json());
+	let response = await fetch('/searchswimmer/' + value).then(response => response.json());
 	console.log(response);
 	// Put result in the list
 	resultDiv.innerHTML = '';
@@ -73,7 +71,7 @@ async function getPerf() {
 	const bassin = bacSelector.value
 	const epreuve = epreuveSelector.value
 
-	let url = `${host}/performances/${bassin}/${epreuve}/${selectedSwimmer.iuf}`
+	let url = `/performances/${bassin}/${epreuve}/${selectedSwimmer.iuf}`
 	let response = await fetch(url).then(response => response.json());
 	console.log(response);
 

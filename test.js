@@ -43,7 +43,12 @@ const puppeteer = require('puppeteer');
 				// On regarde si il y as les splits
 				if (tr.children[0].children.length) {
 					let tdList = tr.children[0].firstChild.onmouseover.toString().match(/<tr>(.*)<\/tr>/)[1].toString().replace(/\\/g, '')
-					data.splits = tdList
+					tdList = tdList.split('</td><td').map(x => x.replace(/.+>/g,'')).filter(x => x != '')
+					let split = {}
+					for (let i = 0; i < tdList.length; i+=3) {
+						split[tdList[i].replace(/[m:]/g, '').trim()] = {time:tdList[i+1],total:tdList[i+2]}
+					}
+					data.splits = split
 				}
 
 				result[epreuve].push(data)
@@ -51,11 +56,6 @@ const puppeteer = require('puppeteer');
 		}
 		return result
 	});
-	console.log(swimmerData['100 Nage Libre Messieurs']);
 	await browser.close();
-
-
-	// bodyHTML = bodyHTML.split(`<table cellpadding="2" id="styleNoBorderNoBottom">`)[1].split('<table>')[0].replace(/[\t\n]/g, '').replace('<tbody>', '').replace('</tbody>', '').split('</tr>')
-
-
+	console.log(swimmerData)
 })()
