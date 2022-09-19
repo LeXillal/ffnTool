@@ -2,17 +2,19 @@
 let timeoutSearchBar = null;
 let epreuvesList = null;
 let selectedSwimmer = null;
-
+const host = "http://167.86.88.132:4444"
 // Elements
 const searchBar = document.getElementById('searchBar');
 const resultDiv = document.getElementById('searchResult');
 const swimmerName = document.getElementById('swimmerName');
 const epreuveSelector = document.getElementById('epreuveSelector');
+const bacSelector = document.getElementById("bacSelector")
 const infoDiv = document.getElementById('infoContent');
+const performancesDiv = document.getElementById('performancesContent')
 
 window.onload = async () => {
 	// Get epreuves
-	const response = await fetch('http://localhost:4444/epreuves/').then(response => response.json());
+	const response = await fetch(host+'/epreuves/').then(response => response.json());
 	epreuvesList = response;
 }
 searchBar.addEventListener('keyup', function (event) {
@@ -21,7 +23,7 @@ searchBar.addEventListener('keyup', function (event) {
 });
 
 async function searchSwimmer(value) {
-	let recherche = 'http://localhost:4444/searchswimmer/' + value
+	let recherche = host+'/searchswimmer/' + value
 	let response = await fetch(recherche).then(response => response.json());
 	console.log(response);
 	// Put result in the list
@@ -62,4 +64,29 @@ function selectswimmer(data) {
 
 	// On affiche le div d'information
 	infoDiv.classList.remove('hidden')
-} 
+}
+
+epreuveSelector.addEventListener('change', () => getPerf())
+bacSelector.addEventListener('change', () => getPerf())
+
+async function getPerf() {
+	const bassin = bacSelector.value
+	const epreuve = epreuveSelector.value
+
+	let url = `${host}/performances/${bassin}/${epreuve}/${selectedSwimmer.iuf}`
+	let response = await fetch(url).then(response => response.json());
+	console.log(response);
+
+	// reponse = {prf: '0.2446', dat: '2021-10-17'}
+	performancesDiv.innerHTML = '';
+	for (let i = 0; i < response.length; i++) {
+		const element = response[i];
+		const div = document.createElement('div');
+		// format .dat from 0.2446 to 0:24:46
+		let res = element.prf.split('.')[0]
+		res += ':' + element.prf.split('.')[1].slice(0, 2)
+		res += ':' + element.prf.split('.')[1].slice(2, 4)
+		div.innerHTML = element.dat + ' : ' + res;
+		performancesDiv.appendChild(div);
+	}
+}
