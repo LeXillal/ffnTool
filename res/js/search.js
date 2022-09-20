@@ -22,7 +22,7 @@ searchBar.addEventListener('keyup', function (event) {
 });
 
 async function searchSwimmer(value) {
-	let response = await fetch('/searchswimmer/' + value).then(response => response.json());
+	let response = await fetch('/searchSwimmer/' + value).then(response => response.json());
 	console.log(response);
 	// Put result in the list
 	resultDiv.innerHTML = '';
