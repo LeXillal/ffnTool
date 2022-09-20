@@ -11,11 +11,14 @@ const epreuves = require('./res/epreuves.json')
 app.use('/res', express.static(path.join(__dirname, 'res')))
 
 app.get('/', (req, res) => {
-	// serve index.html
-	res.sendFile(__dirname + '/index.html');
+	res.redirect('search/')
 })
 
-app.get('/searchswimmer/:query', async (req, res) => {
+app.get('/search/', async (req, res) => {
+	res.sendFile(__dirname + '/pages/search.html');
+})
+
+app.get('/searchSwimmer/:query', async (req, res) => {
 	let query = req.params.query;
 	if (!query) return res.json({ error: 'no query' });
 	if (query.length < 3) return res.json({ error: 'query too short' });
@@ -50,10 +53,7 @@ app.listen(port, () => {
 	console.log(`Example app listening on port ${process.env.PORT}`)
 })
 async function get(url) {
-	const browser = await puppeteer.launch({
-		executablePath: process.env.CHROMIUM_PATH,
-		args: process.env.PUPPETEER_ARGS.split(' ')
-	});
+	const browser = await generateBrowser();
 	const page = await browser.newPage();
 	page.on("error", function (err) {
 		theTempValue = err.toString();
@@ -68,10 +68,7 @@ async function get(url) {
 }
 
 async function getPerf(nageur, bac) {
-	const browser = await puppeteer.launch({
-		executablePath: process.env.CHROMIUM_PATH,
-		args: process.env.PUPPETEER_ARGS.split(' ')
-	});
+	const browser = await generateBrowser();
 	const page = await browser.newPage();
 	page.on("error", function (err) {
 		theTempValue = err.toString();
@@ -131,4 +128,10 @@ async function getPerf(nageur, bac) {
 	});
 	await browser.close();
 	return swimmerData
+}
+
+async function generateBrowser() {
+	let data = { args: process.env.PUPPETEER_ARGS.split(' ') }
+	if (process.env.CHROMIUM_PATH || process.env.CHROMIUM_PATH == '') data.executablePath = process.env.CHROMIUM_PATH
+	return await puppeteer.launch(data);
 }
