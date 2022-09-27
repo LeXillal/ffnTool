@@ -19,18 +19,24 @@ module.exports = async (bac, nageur) => {
 				result[epreuve] = []
 			} else if (epreuve !== 'idk' && textContent.includes('pts')) { // Si y'a le mot "pts" dans le texte c'est un résultat
 				let date = tr.children[5].textContent.trim().split('/')
+				let link = tr.children[7].children[0].href.toString()
 				let data = {
-					perfTime: tr.children[0].textContent.trim(),
-					perfPts: tr.children[3].textContent.trim().replace(/[\(\)pts\ ]/g, ''),
-					perfIsRelay: tr.children[1].textContent != '',
-					swimmerClub: tr.children[8].textContent.trim(),
-					competitionLocation: {
-						country: tr.children[4].children[1].textContent.trim().replace(/[\(\)]/g, ''),
-						city: tr.children[4].children[2].textContent.trim(),
+					perf: {
+						perfTime: tr.children[0].textContent.trim(),
+						perfPts: tr.children[3].textContent.trim().replace(/[\(\)pts\ ]/g, ''),
+						perfIsRelay: tr.children[1].textContent != '',
+						perfClub: tr.children[8].textContent.trim(),
+						perfType: link.split('idepr=')[1].split('&')[0]
 					},
-					competitionDate: date[2] + '-' + date[1] + '-' + date[0],
-					competitionLevel: tr.children[6].textContent.trim().replace(/[\[\]]/g, ''),
-					competitionLink: tr.children[7].children[0].href
+					competition: {
+						competitionLocation: {
+							country: tr.children[4].children[1].textContent.trim().replace(/[\(\)]/g, ''),
+							city: tr.children[4].children[2].textContent.trim(),
+						},
+						competitionDate: date[2] + '-' + date[1] + '-' + date[0],
+						competitionLevel: tr.children[6].textContent.trim().replace(/[\[\]]/g, ''),
+						competitionId: link.split('&idcpt=')[1].split('&')[0]
+					}
 				}
 
 				// On regarde si il y as les splits
@@ -46,7 +52,7 @@ module.exports = async (bac, nageur) => {
 							split[dist].splitTime = tdList[i + 2].replace(/[\(\)]/g, '')
 						}
 					}
-					data.splits = split
+					data.perf.splits = split
 				}
 
 				result[epreuve].push(data)

@@ -12,6 +12,5 @@ module.exports = async (query) => {
 
 	let content = await page.evaluate(() => document.body.innerHTML);
 	await browser.close();
-	console.log(content)
 	return content;
 }

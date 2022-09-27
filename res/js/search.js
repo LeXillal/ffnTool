@@ -6,7 +6,6 @@ let selectedSwimmer = null;
 const searchBar = document.getElementById('searchBar');
 const resultDiv = document.getElementById('searchResult');
 const swimmerName = document.getElementById('swimmerName');
-const epreuveSelector = document.getElementById('epreuveSelector');
 const bacSelector = document.getElementById("bacSelector")
 const infoDiv = document.getElementById('infoContent');
 const performancesDiv = document.getElementById('performancesContent')
@@ -23,7 +22,6 @@ searchBar.addEventListener('keyup', function (event) {
 
 async function searchSwimmer(value) {
 	let response = await fetch('/searchSwimmer/' + value).then(response => response.json());
-	console.log(response);
 	// Put result in the list
 	resultDiv.innerHTML = '';
 	for (let i = 0; i < response.length; i++) {
@@ -45,46 +43,23 @@ function selectswimmer(data) {
 	selectedSwimmer = data
 	swimmerName.innerText = data.ind
 
-	// data : {iuf: '109535', ind: 'BALLOUARD Anne-Cécile (1985) F FRA - TOULOUSE NAT SYNCHRO', sex: '#ff69b4', clb: 'TOULOUSE NAT SYNCHRO'}
-	// sexe : F : #ff69b4 / M: #1e90ff
-	// Remplire le selecteur avec les epreuves du sexe
-	epreuveSelector.innerHTML = ''
-	const sexe = data.sex == "#ff69b4" ? 0 : 1
-	const epreuves = epreuvesList[sexe]
-
-	for (epreuve of Object.keys(epreuves)) {
-		let intitule = epreuves[epreuve]
-		const option = document.createElement('option');
-		option.value = epreuve
-		option.innerText = intitule
-		epreuveSelector.appendChild(option)
-	}
-
 	// On affiche le div d'information
+	getPerfs()
 	infoDiv.classList.remove('hidden')
 }
 
-epreuveSelector.addEventListener('change', () => getPerf())
-bacSelector.addEventListener('change', () => getPerf())
+bacSelector.addEventListener('change', () => getPerfs())
 
-async function getPerf() {
+async function getPerfs() {
 	const bassin = bacSelector.value
-	const epreuve = epreuveSelector.value
 
-	let url = `/performances/${bassin}/${epreuve}/${selectedSwimmer.iuf}`
+	let url = `/performances/${bassin}/${selectedSwimmer.iuf}`
 	let response = await fetch(url).then(response => response.json());
 	console.log(response);
 
-	// reponse = {prf: '0.2446', dat: '2021-10-17'}
-	performancesDiv.innerHTML = '';
-	for (let i = 0; i < response.length; i++) {
-		const element = response[i];
-		const div = document.createElement('div');
-		// format .dat from 0.2446 to 0:24:46
-		let res = element.prf.split('.')[0]
-		res += ':' + element.prf.split('.')[1].slice(0, 2)
-		res += ':' + element.prf.split('.')[1].slice(2, 4)
-		div.innerHTML = element.dat + ' : ' + res;
-		performancesDiv.appendChild(div);
-	}
+	performancesDiv.innerHTML = ''
+	// Create pre
+	const pre = document.createElement('pre')
+	pre.innerText = JSON.stringify(response, null, 2)
+	performancesDiv.appendChild(pre)
 }
