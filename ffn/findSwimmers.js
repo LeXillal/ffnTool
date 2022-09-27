@@ -1,6 +1,5 @@
 const generateBrowser = require("./generateBrowser")
 
-console.log(generateBrowser)
 module.exports = async (query) => {
 	if (!query) return { error: 'no query' };
 	if (query.length < 3) return { error: 'query too short' };

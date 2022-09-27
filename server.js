@@ -4,8 +4,6 @@ const express = require('express')
 const app = express()
 const ffn = require('./ffn/index.js')
 
-console.log(ffn)
-
 require('dotenv').config()
 
 const port = process.env.PORT
