@@ -1,6 +1,6 @@
 # ffnTool
 
-```
+```JS
 import { findSwimmers, getPerformances, getBestPerformances } from './ffn/index.js';
 
 findSwimmers('piron thomas').then((swimmers) => {
