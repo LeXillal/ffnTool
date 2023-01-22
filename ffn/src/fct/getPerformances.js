@@ -1,10 +1,11 @@
-const generateBrowser = require("./generateBrowser")
+import generateBrowser from "./generateBrowser.js";
 
-module.exports = async (bac, nageur) => {
+export default async (bac, nageur) => {
 	const browser = await generateBrowser();
 	const page = await browser.newPage();
 
-	await page.goto(`https://ffn.extranat.fr/webffn/nat_recherche.php?idact=nat&idrch_id=${nageur}&idopt=prf&idbas=${bac}`);
+	const link = `https://ffn.extranat.fr/webffn/nat_recherche.php?idact=nat&idrch_id=${nageur}&idopt=prf&idbas=${bac}`
+	await page.goto(link);
 
 	let swimmerData = await page.evaluate(() => {
 		let trList = document.querySelectorAll('table#styleNoBorderNoBottom tbody')[1].children
@@ -18,7 +19,6 @@ module.exports = async (bac, nageur) => {
 				epreuve = splited[0]
 				result[epreuve] = []
 			} else if (epreuve !== 'idk' && textContent.includes('pts')) { // Si y'a le mot "pts" dans le texte c'est un résultat
-				let date = tr.children[5].textContent.trim().split('/')
 				let link = tr.children[7].children[0].href.toString()
 				let data = {
 					perf: {
@@ -33,7 +33,7 @@ module.exports = async (bac, nageur) => {
 							country: tr.children[4].children[1].textContent.trim().replace(/[\(\)]/g, ''),
 							city: tr.children[4].children[2].textContent.trim(),
 						},
-						competitionDate: date[2] + '-' + date[1] + '-' + date[0],
+						competitionDate: tr.children[5].textContent.trim(),
 						competitionLevel: tr.children[6].textContent.trim().replace(/[\[\]]/g, ''),
 						competitionId: link.split('&idcpt=')[1].split('&')[0]
 					}
@@ -41,8 +41,7 @@ module.exports = async (bac, nageur) => {
 
 				// On regarde si il y as les splits
 				if (tr.children[0].children.length) {
-					let tdList = tr.children[0].firstChild.onmouseover.toString().match(/<tr>(.*)<\/tr>/)[1].toString().replace(/\\/g, '')
-					tdList = tdList.split('</td><td').map(x => x.replace(/.+>/g, '')).filter(x => x != '')
+					let tdList = tr.children[0].firstChild.onmouseover.toString().match(/<tr>(.*)<\/tr>/)[1].toString().replace(/\\/g, '').split('</td><td').map(x => x.replace(/.+>/g, '')).filter(x => x != '')
 					let split = {}
 					for (let i = 0; i < tdList.length; i += 3) {
 						let dist = tdList[i].replace(/[m:]/g, '').trim()

@@ -1,6 +1,6 @@
-const generateBrowser = require("./generateBrowser")
+import generateBrowser from "./generateBrowser.js";
 
-module.exports = async (query) => {
+export default async (query) => {
 	if (!query) return { error: 'no query' };
 	if (query.length < 3) return { error: 'query too short' };
 	const browser = await generateBrowser();
@@ -12,5 +12,5 @@ module.exports = async (query) => {
 
 	let content = await page.evaluate(() => document.body.innerHTML);
 	await browser.close();
-	return content;
+	return JSON.parse(content);
 }
